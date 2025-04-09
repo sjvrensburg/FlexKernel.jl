@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-sjvrensburg/FlexKernel.jl-blue.svg)](https://github.com/sjvrensburg/FlexKernel.jl)
 
-**FlexKernel.jl** is a Julia package for kernel methods with efficient approximations, designed for large-scale machine learning tasks. It provides custom kernel implementations, Nyström approximations for kernel matrices, and mini-batch k-means clustering, all optimized for performance and usability.
+**FlexKernel.jl** is a Julia package for kernel methods with efficient approximations, designed for large-scale machine learning tasks. It provides custom kernel implementations, Nyström approximations for kernel matrices, mini-batch k-means clustering, and visualization tools, all optimized for performance and usability.
 
 ## Features
 
@@ -11,6 +11,7 @@
 - **Nyström Approximation**: Efficiently approximates large kernel matrices for scalable computations.
 - **Mini-batch K-means**: Fast clustering for landmark selection or standalone use.
 - **Data Utilities**: Tools for preparing, standardizing, and splitting data.
+- **Plotting Functions**: Visualization tools for kernels, landmarks, and Nyström approximation diagnostics.
 
 **Data Format**: All functions expect matrices with features in rows and observations in columns (`n_features × n_samples`).
 
@@ -33,6 +34,7 @@ FlexKernel.jl relies on the following Julia packages:
 - `KernelFunctions`
 - `CSV`
 - `DataFrames`
+- `Plots`
 
 These will be automatically installed when you add FlexKernel.jl.
 
@@ -124,7 +126,96 @@ Random.seed!(42)
 X_train, y_train, X_test, y_test = split_data(X_std, y, test_ratio=0.33, seed=42)
 ```
 
-### 5. Full Example: Kernel Regression with Nyström
+### 5. Plotting and Visualization
+
+FlexKernel.jl includes plotting functions to visualize kernels, landmark distributions, and Nyström approximation accuracy. These rely on the `Plots.jl` package.
+
+#### Plotting a 1D Kernel
+
+Visualize the kernel function `k(x0, x)` for a range of `x` values.
+
+```julia
+using FlexKernel
+using Plots
+
+# Define a kernel
+k = SincKernel(1.0)
+
+# Plot the kernel centered at x0 = 0.0
+plot_kernel_1d(k, 0.0, -5:0.1:5, title="Sinc Kernel", xlabel="x", ylabel="k(0, x)", label="Sinc")
+```
+
+#### Comparing Kernels
+
+Compare multiple kernels on the same plot.
+
+```julia
+using FlexKernel
+using KernelFunctions
+using Plots
+
+# Define kernels
+k1 = SincKernel(1.0)
+k2 = SqExponentialKernel()
+
+# Compare kernels
+compare_kernels_1d([k1, k2], 0.0, -5:0.1:5, labels=["Sinc", "RBF"], title="Kernel Comparison")
+```
+
+#### Visualizing a 2D Kernel
+
+Create a heatmap of a kernel function over a 2D grid.
+
+```julia
+using FlexKernel
+using Plots
+
+# Define a kernel
+k = SincKernel(0.5)
+
+# Plot a 2D heatmap
+plot_kernel_2d(k, [0.0, 0.0], -3:0.1:3, -3:0.1:3, title="Sinc Kernel Heatmap", xlabel="x1", ylabel="x2")
+```
+
+#### Plotting Landmarks
+
+Visualize data points and Nyström landmarks in 2D, with optional clustering.
+
+```julia
+using FlexKernel
+using Plots
+using Random
+
+# Generate data
+Random.seed!(42)
+X = randn(2, 100)  # 2 features, 100 samples
+landmarks = compute_nystrom_landmarks(X, 5, seed=42)
+
+# Plot data and landmarks
+plot_landmarks_2d(X, landmarks, title="Landmark Distribution", color_by_cluster=true)
+```
+
+#### Analyzing Nyström Approximation
+
+Plot the eigenvalues of the Nyström approximation versus the full kernel matrix to assess accuracy.
+
+```julia
+using FlexKernel
+using Plots
+using Random
+
+# Generate data and compute Nyström approximation
+Random.seed!(42)
+X = randn(2, 50)  # 2 features, 50 samples
+k = SincKernel(0.5)
+landmarks = compute_nystrom_landmarks(X, 10, seed=42)
+nystrom = compute_nystrom_approximation(X, landmarks, k)
+
+# Plot eigenvalue comparison
+plot_nystrom_accuracy(nystrom, X, k, compute_full=true, title="Nyström Approximation Accuracy")
+```
+
+### 6. Full Example: Kernel Regression with Nyström
 
 A complete workflow combining kernel methods and Nyström approximation.
 
@@ -167,6 +258,7 @@ Full documentation for each function is available in the source code via Julia's
 ?FlexKernel.SincKernel
 ?FlexKernel.compute_nystrom_approximation
 ?FlexKernel.mini_batch_kmeans
+?FlexKernel.plot_kernel_1d
 ```
 
 ## Contributing
