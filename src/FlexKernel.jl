@@ -52,6 +52,7 @@ include("kernels.jl")
 include("nystrom.jl")
 include("kmeans.jl")
 include("utilities.jl")
+include("plotting.jl")
 
 # Re-export KernelFunctions for user convenience
 export KernelFunctions
@@ -65,6 +66,9 @@ export NystromApproximation, compute_nystrom_landmarks, compute_nystrom_approxim
 
 # Export K-means
 export mini_batch_kmeans, KMeansResult
+
+# Export plotting function
+export plot_kernel_1d, compare_kernels_1d, plot_kernel_2d, plot_landmarks_2d, plot_nystrom_accuracy
 
 # Export utilities
 export prepare_matrix, to_dataframe
